@@ -1,3 +1,6 @@
 *.bmp
 resource_path.hpp
 *.*sdf
+.vscode
+build
+dependencies
