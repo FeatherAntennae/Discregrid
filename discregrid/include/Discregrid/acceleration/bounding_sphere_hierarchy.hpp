@@ -6,66 +6,58 @@
 namespace Discregrid
 {
 
-class TriangleMeshBSH : public KDTree<BoundingSphere>
-{
+    class TriangleMeshBSH : public KDTree<BoundingSphere>
+    {
 
-public:
+    public:
+        using super = KDTree<BoundingSphere>;
 
-	using super = KDTree<BoundingSphere>;
+        TriangleMeshBSH(std::vector<Eigen::Vector3f> const &vertices,
+                        std::vector<std::array<unsigned int, 3>> const &faces);
 
-	TriangleMeshBSH(std::vector<Eigen::Vector3f> const& vertices,
-		std::vector<std::array<unsigned int, 3>> const& faces);
+        Eigen::Vector3f const &entityPosition(unsigned int i) const final;
+        void computeHull(unsigned int b, unsigned int n, BoundingSphere &hull) const final;
 
-	Eigen::Vector3f const& entityPosition(unsigned int i) const final;
-	void computeHull(unsigned int b, unsigned int n, BoundingSphere& hull) const final;
+    private:
+        std::vector<Eigen::Vector3f> const &m_vertices;
+        std::vector<std::array<unsigned int, 3>> const &m_faces;
 
-private:
+        std::vector<Eigen::Vector3f> m_tri_centers;
+    };
 
-	std::vector<Eigen::Vector3f> const& m_vertices;
-	std::vector<std::array<unsigned int, 3>> const& m_faces;
+    class TriangleMeshBBH : public KDTree<Eigen::AlignedBox3f>
+    {
+    public:
+        using super = KDTree<Eigen::AlignedBox3f>;
 
-	std::vector<Eigen::Vector3f> m_tri_centers;
-};
+        TriangleMeshBBH(std::vector<Eigen::Vector3f> const &vertices,
+                        std::vector<std::array<unsigned int, 3>> const &faces);
 
-class TriangleMeshBBH : public KDTree<Eigen::AlignedBox3f>
-{
-public:
+        Eigen::Vector3f const &entityPosition(unsigned int i) const final;
+        void computeHull(unsigned int b, unsigned int n, Eigen::AlignedBox3f &hull) const final;
 
-	using super = KDTree<Eigen::AlignedBox3f>;
+    private:
+        std::vector<Eigen::Vector3f> const &m_vertices;
+        std::vector<std::array<unsigned int, 3>> const &m_faces;
 
-	TriangleMeshBBH(std::vector<Eigen::Vector3f> const& vertices,
-		std::vector<std::array<unsigned int, 3>> const& faces);
+        std::vector<Eigen::Vector3f> m_tri_centers;
+    };
 
-	Eigen::Vector3f const& entityPosition(unsigned int i) const final;
-	void computeHull(unsigned int b, unsigned int n, Eigen::AlignedBox3f& hull) const final;
+    class PointCloudBSH : public KDTree<BoundingSphere>
+    {
 
-private:
+    public:
+        using super = KDTree<BoundingSphere>;
 
-	std::vector<Eigen::Vector3f> const& m_vertices;
-	std::vector<std::array<unsigned int, 3>> const& m_faces;
+        PointCloudBSH();
+        PointCloudBSH(std::vector<Eigen::Vector3f> const &vertices);
 
-	std::vector<Eigen::Vector3f> m_tri_centers;
+        Eigen::Vector3f const &entityPosition(unsigned int i) const final;
+        void computeHull(unsigned int b, unsigned int n, BoundingSphere &hull)
+            const final;
 
-
-};
-
-class PointCloudBSH : public KDTree<BoundingSphere>
-{
-
-public:
-
-	using super = KDTree<BoundingSphere>;
-
-	PointCloudBSH();
-	PointCloudBSH(std::vector<Eigen::Vector3f> const& vertices);
-
-	Eigen::Vector3f const& entityPosition(unsigned int i) const final;
-	void computeHull(unsigned int b, unsigned int n, BoundingSphere& hull)
-		const final;
-
-private:
-
-	std::vector<Eigen::Vector3f> const* m_vertices;
-};
+    private:
+        std::vector<Eigen::Vector3f> const *m_vertices;
+    };
 
 }

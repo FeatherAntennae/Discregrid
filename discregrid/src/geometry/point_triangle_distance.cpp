@@ -8,282 +8,307 @@ using namespace Eigen;
 namespace Discregrid
 {
 
-float
-point_triangle_sqdistance(Vector3f const& point, 
-    std::array<Vector3f const*, 3> const& triangle, 
-    Vector3f* nearest_point,
-    NearestEntity* ne)
-{
-    Vector3f diff = *triangle[0] - point;
-    Vector3f edge0 = *triangle[1] - *triangle[0];
-    Vector3f edge1 = *triangle[2] - *triangle[0];
-    float a00 = edge0.dot(edge0);
-    float a01 = edge0.dot(edge1);
-    float a11 = edge1.dot(edge1);
-    float b0 = diff.dot(edge0);
-    float b1 = diff.dot(edge1);
-    float c = diff.dot(diff);
-    float det = std::abs(a00*a11 - a01*a01);
-    float s = a01*b1 - a11*b0;
-    float t = a01*b0 - a00*b1;
-
-    float d2 = -1.0;
-
-    if (s + t <= det)
+    float
+    point_triangle_sqdistance(Vector3f const &point,
+                              std::array<Vector3f const *, 3> const &triangle,
+                              Vector3f *nearest_point,
+                              NearestEntity *ne)
     {
-        if (s < 0)
+        Vector3f diff = *triangle[0] - point;
+        Vector3f edge0 = *triangle[1] - *triangle[0];
+        Vector3f edge1 = *triangle[2] - *triangle[0];
+        float a00 = edge0.dot(edge0);
+        float a01 = edge0.dot(edge1);
+        float a11 = edge1.dot(edge1);
+        float b0 = diff.dot(edge0);
+        float b1 = diff.dot(edge1);
+        float c = diff.dot(diff);
+        float det = std::abs(a00 * a11 - a01 * a01);
+        float s = a01 * b1 - a11 * b0;
+        float t = a01 * b0 - a00 * b1;
+
+        float d2 = -1.0;
+
+        if (s + t <= det)
         {
-            if (t < 0)  // region 4
+            if (s < 0)
             {
-                if (b0 < 0)
+                if (t < 0) // region 4
                 {
-                    t = 0;
-                    if (-b0 >= a00)
-                    {   // VN1
-                        if (ne) *ne = NearestEntity::VN1;
-                        s = 1;
-                        d2 = a00 + (2)*b0 + c;
+                    if (b0 < 0)
+                    {
+                        t = 0;
+                        if (-b0 >= a00)
+                        { // VN1
+                            if (ne)
+                                *ne = NearestEntity::VN1;
+                            s = 1;
+                            d2 = a00 + (2) * b0 + c;
+                        }
+                        else
+                        {
+                            // EN0
+                            if (ne)
+                                *ne = NearestEntity::EN0;
+                            s = -b0 / a00;
+                            d2 = b0 * s + c;
+                        }
                     }
                     else
                     {
-                        // EN0
-                        if (ne) *ne = NearestEntity::EN0;
-                        s = -b0 / a00;
-                        d2 = b0*s + c;
+                        s = 0;
+                        if (b1 >= 0)
+                        { // VN0
+                            if (ne)
+                                *ne = NearestEntity::VN0;
+                            t = 0;
+                            d2 = c;
+                        }
+                        else if (-b1 >= a11)
+                        {
+                            // VN2
+                            if (ne)
+                                *ne = NearestEntity::VN2;
+                            t = 1;
+                            d2 = a11 + (2) * b1 + c;
+                        }
+                        else
+                        {
+                            // EN2
+                            if (ne)
+                                *ne = NearestEntity::EN2;
+                            t = -b1 / a11;
+                            d2 = b1 * t + c;
+                        }
                     }
                 }
-                else
+                else // region 3
                 {
                     s = 0;
                     if (b1 >= 0)
-                    {   // VN0
-                        if (ne) *ne = NearestEntity::VN0;
+                    { // VN0
+                        if (ne)
+                            *ne = NearestEntity::VN0;
                         t = 0;
                         d2 = c;
                     }
                     else if (-b1 >= a11)
-                    {
-                        // VN2
-                        if (ne) *ne = NearestEntity::VN2;
+                    { // VN2
+                        if (ne)
+                            *ne = NearestEntity::VN2;
                         t = 1;
-                        d2 = a11 + (2)*b1 + c;
+                        d2 = a11 + (2) * b1 + c;
+                    }
+                    else
+                    { // EN2
+                        if (ne)
+                            *ne = NearestEntity::EN2;
+                        t = -b1 / a11;
+                        d2 = b1 * t + c;
+                    }
+                }
+            }
+            else if (t < 0) // region 5
+            {
+                t = 0;
+                if (b0 >= 0)
+                { // VN0
+                    if (ne)
+                        *ne = NearestEntity::VN0;
+                    s = 0;
+                    d2 = c;
+                }
+                else if (-b0 >= a00)
+                { // VN1
+                    if (ne)
+                        *ne = NearestEntity::VN1;
+                    s = 1;
+                    d2 = a00 + (2) * b0 + c;
+                }
+                else
+                { // EN0
+                    if (ne)
+                        *ne = NearestEntity::EN0;
+                    s = -b0 / a00;
+                    d2 = b0 * s + c;
+                }
+            }
+            else // region 0
+            {    // FN
+                if (ne)
+                    *ne = NearestEntity::FN;
+                // minimum at interior point
+                float invDet = (1) / det;
+                s *= invDet;
+                t *= invDet;
+                d2 = s * (a00 * s + a01 * t + (2) * b0) +
+                     t * (a01 * s + a11 * t + (2) * b1) + c;
+            }
+        }
+        else
+        {
+            float tmp0, tmp1, numer, denom;
+
+            if (s < 0) // region 2
+            {
+                tmp0 = a01 + b0;
+                tmp1 = a11 + b1;
+                if (tmp1 > tmp0)
+                {
+                    numer = tmp1 - tmp0;
+                    denom = a00 - (2) * a01 + a11;
+                    if (numer >= denom)
+                    { // VN1
+                        if (ne)
+                            *ne = NearestEntity::VN1;
+                        s = 1;
+                        t = 0;
+                        d2 = a00 + (2) * b0 + c;
+                    }
+                    else
+                    {
+                        // EN1
+                        if (ne)
+                            *ne = NearestEntity::EN1;
+                        s = numer / denom;
+                        t = 1 - s;
+                        d2 = s * (a00 * s + a01 * t + (2) * b0) +
+                             t * (a01 * s + a11 * t + (2) * b1) + c;
+                    }
+                }
+                else
+                {
+                    s = 0;
+                    if (tmp1 <= 0)
+                    { // VN2
+                        if (ne)
+                            *ne = NearestEntity::VN2;
+                        t = 1;
+                        d2 = a11 + (2) * b1 + c;
+                    }
+                    else if (b1 >= 0)
+                    { // VN0
+                        if (ne)
+                            *ne = NearestEntity::VN0;
+                        t = 0;
+                        d2 = c;
                     }
                     else
                     {
                         // EN2
-                        if (ne) *ne = NearestEntity::EN2;
+                        if (ne)
+                            *ne = NearestEntity::EN2;
                         t = -b1 / a11;
-                        d2 = b1*t + c;
+                        d2 = b1 * t + c;
                     }
                 }
             }
-            else  // region 3
+            else if (t < 0) // region 6
             {
-                s = 0;
-                if (b1 >= 0)
-                {   // VN0
-                    if (ne) *ne = NearestEntity::VN0;
-                    t = 0;
-                    d2 = c;
-                }
-                else if (-b1 >= a11)
-                {   // VN2
-                    if (ne) *ne = NearestEntity::VN2;
-                    t = 1;
-                    d2 = a11 + (2)*b1 + c;
-                }
-                else
-                {   // EN2
-                    if (ne) *ne = NearestEntity::EN2;
-                    t = -b1 / a11;
-                    d2 = b1*t + c;
-                }
-            }
-        }
-        else if (t < 0)  // region 5
-        {
-            t = 0;
-            if (b0 >= 0)
-            {   // VN0
-                if (ne) *ne = NearestEntity::VN0;
-                s = 0;
-                d2 = c;
-            }
-            else if (-b0 >= a00)
-            {   // VN1
-                if (ne) *ne = NearestEntity::VN1;
-                s = 1;
-                d2 = a00 + (2)*b0 + c;
-            }
-            else
-            {   // EN0
-                if (ne) *ne = NearestEntity::EN0;
-                s = -b0 / a00;
-                d2 = b0*s + c;
-            }
-        }
-        else  // region 0 
-        {   // FN
-            if (ne) *ne = NearestEntity::FN;
-            // minimum at interior point
-            float invDet = (1) / det;
-            s *= invDet;
-            t *= invDet;
-            d2 = s*(a00*s + a01*t + (2)*b0) +
-                t*(a01*s + a11*t + (2)*b1) + c;
-        }
-    }
-    else
-    {
-        float tmp0, tmp1, numer, denom;
-
-        if (s < 0)  // region 2
-        {
-            tmp0 = a01 + b0;
-            tmp1 = a11 + b1;
-            if (tmp1 > tmp0)
-            {
-                numer = tmp1 - tmp0;
-                denom = a00 - (2)*a01 + a11;
-                if (numer >= denom)
-                {   // VN1
-                    if (ne) *ne = NearestEntity::VN1;
-                    s = 1;
-                    t = 0;
-                    d2 = a00 + (2)*b0 + c;
+                tmp0 = a01 + b1;
+                tmp1 = a00 + b0;
+                if (tmp1 > tmp0)
+                {
+                    numer = tmp1 - tmp0;
+                    denom = a00 - (2) * a01 + a11;
+                    if (numer >= denom)
+                    { // VN2
+                        if (ne)
+                            *ne = NearestEntity::VN2;
+                        t = 1;
+                        s = 0;
+                        d2 = a11 + (2) * b1 + c;
+                    }
+                    else
+                    {
+                        // EN1
+                        if (ne)
+                            *ne = NearestEntity::EN1;
+                        t = numer / denom;
+                        s = 1 - t;
+                        d2 = s * (a00 * s + a01 * t + (2) * b0) +
+                             t * (a01 * s + a11 * t + (2) * b1) + c;
+                    }
                 }
                 else
                 {
-                    // EN1
-                    if (ne) *ne = NearestEntity::EN1;
-                    s = numer / denom;
-                    t = 1 - s;
-                    d2 = s*(a00*s + a01*t + (2)*b0) +
-                        t*(a01*s + a11*t + (2)*b1) + c;
-                }
-            }
-            else
-            {
-                s = 0;
-                if (tmp1 <= 0)
-                {   // VN2
-                    if (ne) *ne = NearestEntity::VN2;
-                    t = 1;
-                    d2 = a11 + (2)*b1 + c;
-                }
-                else if (b1 >= 0)
-                {   // VN0
-                    if (ne) *ne = NearestEntity::VN0;
                     t = 0;
-                    d2 = c;
-                }
-                else
-                {
-                    // EN2
-                    if (ne) *ne = NearestEntity::EN2;
-                    t = -b1 / a11;
-                    d2 = b1*t + c;
+                    if (tmp1 <= 0)
+                    { // VN1
+                        if (ne)
+                            *ne = NearestEntity::VN1;
+                        s = 1;
+                        d2 = a00 + (2) * b0 + c;
+                    }
+                    else if (b0 >= 0)
+                    { // VN0
+                        if (ne)
+                            *ne = NearestEntity::VN0;
+                        s = 0;
+                        d2 = c;
+                    }
+                    else
+                    {
+                        // EN0
+                        if (ne)
+                            *ne = NearestEntity::EN0;
+                        s = -b0 / a00;
+                        d2 = b0 * s + c;
+                    }
                 }
             }
-        }
-        else if (t < 0)  // region 6
-        {
-            tmp0 = a01 + b1;
-            tmp1 = a00 + b0;
-            if (tmp1 > tmp0)
+            else // region 1
             {
-                numer = tmp1 - tmp0;
-                denom = a00 - (2)*a01 + a11;
-                if (numer >= denom)
-                {   // VN2
-                    if (ne) *ne = NearestEntity::VN2;
-                    t = 1;
+                numer = a11 + b1 - a01 - b0;
+                if (numer <= 0)
+                { // VN2
+                    if (ne)
+                        *ne = NearestEntity::VN2;
                     s = 0;
-                    d2 = a11 + (2)*b1 + c;
+                    t = 1;
+                    d2 = a11 + (2) * b1 + c;
                 }
                 else
                 {
-                    // EN1
-                    if (ne) *ne = NearestEntity::EN1;
-                    t = numer / denom;
-                    s = 1 - t;
-                    d2 = s*(a00*s + a01*t + (2)*b0) +
-                        t*(a01*s + a11*t + (2)*b1) + c;
-                }
-            }
-            else
-            {
-                t = 0;
-                if (tmp1 <= 0)
-                {   // VN1
-                    if (ne) *ne = NearestEntity::VN1;
-                    s = 1;
-                    d2 = a00 + (2)*b0 + c;
-                }
-                else if (b0 >= 0)
-                {   // VN0
-                    if (ne) *ne = NearestEntity::VN0;
-                    s = 0;
-                    d2 = c;
-                }
-                else
-                {
-                    // EN0
-                    if (ne) *ne = NearestEntity::EN0;
-                    s = -b0 / a00;
-                    d2 = b0*s + c;
+                    denom = a00 - (2) * a01 + a11;
+                    if (numer >= denom)
+                    { // VN1
+                        if (ne)
+                            *ne = NearestEntity::VN1;
+                        s = 1;
+                        t = 0;
+                        d2 = a00 + (2) * b0 + c;
+                    }
+                    else
+                    { // EN1
+                        if (ne)
+                            *ne = NearestEntity::EN1;
+                        s = numer / denom;
+                        t = 1 - s;
+                        d2 = s * (a00 * s + a01 * t + (2) * b0) +
+                             t * (a01 * s + a11 * t + (2) * b1) + c;
+                    }
                 }
             }
         }
-        else  // region 1
+
+        // Account for numerical round-off error.
+        if (d2 < 0)
         {
-            numer = a11 + b1 - a01 - b0;
-            if (numer <= 0)
-            {   // VN2
-                if (ne) *ne = NearestEntity::VN2;
-                s = 0;
-                t = 1;
-                d2 = a11 + (2)*b1 + c;
-            }
-            else
-            {
-                denom = a00 - (2)*a01 + a11;
-                if (numer >= denom)
-                {   // VN1
-                    if (ne) *ne = NearestEntity::VN1;
-                    s = 1;
-                    t = 0;
-                    d2 = a00 + (2)*b0 + c;
-                }
-                else
-                {   // EN1
-                    if (ne) *ne = NearestEntity::EN1;
-                    s = numer / denom;
-                    t = 1 - s;
-                    d2 = s*(a00*s + a01*t + (2)*b0) +
-                        t*(a01*s + a11*t + (2)*b1) + c;
-                }
-            }
+            d2 = 0;
         }
+
+        if (nearest_point)
+            *nearest_point = *triangle[0] + s * edge0 + t * edge1;
+
+        return d2;
+
+        //result.distance = sqrt(d2);
+        //result.triangleClosestPoint = triangle.v[0] + s*edge0 + t*edge1;
+        //result.triangleParameter[1] = s;
+        //result.triangleParameter[2] = t;
+        //result.triangleParameter[0] = 1 - s - t;
+        //return result;
     }
-
-    // Account for numerical round-off error.
-    if (d2 < 0)
-    {
-        d2 = 0;
-    }
-
-    if (nearest_point)
-        *nearest_point = *triangle[0] + s*edge0 + t*edge1;
-
-    return d2;
-
-    //result.distance = sqrt(d2);
-    //result.triangleClosestPoint = triangle.v[0] + s*edge0 + t*edge1;
-    //result.triangleParameter[1] = s;
-    //result.triangleParameter[2] = t;
-    //result.triangleParameter[0] = 1 - s - t;
-    //return result;
-}
 
 }

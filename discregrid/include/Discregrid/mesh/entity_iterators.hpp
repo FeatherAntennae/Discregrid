@@ -2,263 +2,279 @@
 
 #include "halfedge.hpp"
 
-#include <iterator>
-#include <array>
 #include <Eigen/Core>
+#include <array>
+#include <iterator>
 
 namespace Discregrid
 {
 
-class TriangleMesh;
+    class TriangleMesh;
 
-class FaceContainer;
-class FaceIterator : public
-	std::iterator<std::random_access_iterator_tag, std::array<unsigned int, 3>>
-{
-public:
+    class FaceContainer;
+    class FaceIterator : public std::iterator<std::random_access_iterator_tag, std::array<unsigned int, 3>>
+    {
+    public:
+        typedef FaceIterator _Mytype;
 
-	typedef FaceIterator _Mytype;
+        FaceIterator() = delete;
 
-	FaceIterator() = delete;
+        reference operator*();
 
-	reference operator*();
+        bool operator<(_Mytype const &other) const
+        {
+            return m_index < other.m_index;
+        }
+        bool operator==(_Mytype const &other) const
+        {
+            return m_index == other.m_index;
+        }
 
-	bool operator<(_Mytype const& other) const
-	{
-		return m_index < other.m_index;
-	}
-	bool operator==(_Mytype const& other) const
-	{
-		return m_index == other.m_index;
-	}
+        bool operator!=(_Mytype const &other) const
+        {
+            return !(*this == other);
+        }
 
-	bool operator!=(_Mytype const& other) const
-	{
-		return !(*this == other);
-	}
+        inline _Mytype &operator++()
+        {
+            ++m_index;
+            return *this;
+        }
+        inline _Mytype &operator--()
+        {
+            --m_index;
+            return *this;
+        }
 
-	inline _Mytype& operator++() { ++m_index; return *this; }
-	inline _Mytype& operator--() { --m_index; return *this; }
+        inline _Mytype operator+(_Mytype const &rhs)
+        {
+            return _Mytype(m_index + rhs.m_index, m_mesh);
+        }
+        inline difference_type operator-(_Mytype const &rhs)
+        {
+            return m_index - rhs.m_index;
+        }
+        inline _Mytype operator-(int const &rhs)
+        {
+            return _Mytype(m_index - rhs, m_mesh);
+        }
 
-	inline _Mytype operator+(_Mytype const& rhs)
-	{
-		return _Mytype(m_index + rhs.m_index, m_mesh);
-	}
-	inline difference_type operator-(_Mytype const& rhs)
-	{
-		return m_index - rhs.m_index;
-	}
-	inline _Mytype operator-(int const& rhs)
-	{
-		return _Mytype(m_index - rhs, m_mesh);
-	}
+        unsigned int vertex(unsigned int i) const;
+        unsigned int &vertex(unsigned int i);
 
-	unsigned int vertex(unsigned int i) const;
-	unsigned int& vertex(unsigned int i);
+    private:
+        friend class FaceContainer;
+        FaceIterator(unsigned int index, TriangleMesh *mesh)
+            : m_index(index), m_mesh(mesh) {}
 
-private:
+        unsigned int m_index;
+        TriangleMesh *m_mesh;
+    };
+    class FaceConstIterator : public std::iterator<std::random_access_iterator_tag, std::array<unsigned int, 3> const>
+    {
 
-	friend class FaceContainer;
-	FaceIterator(unsigned int index, TriangleMesh* mesh)
-		: m_index(index), m_mesh(mesh) {}
+    public:
+        typedef FaceConstIterator _Mytype;
 
-	unsigned int m_index;
-	TriangleMesh* m_mesh;
-};
-class FaceConstIterator : public
-	std::iterator<std::random_access_iterator_tag, std::array<unsigned int, 3> const>
-{
+        FaceConstIterator() = delete;
 
-public:
+        reference operator*();
 
-	typedef FaceConstIterator _Mytype;
+        bool operator<(_Mytype const &other) const
+        {
+            return m_index < other.m_index;
+        }
+        bool operator==(_Mytype const &other) const
+        {
+            return m_index == other.m_index;
+        }
 
-	FaceConstIterator() = delete;
+        bool operator!=(_Mytype const &other) const
+        {
+            return !(*this == other);
+        }
 
-	reference operator*();
+        inline _Mytype &operator++()
+        {
+            ++m_index;
+            return *this;
+        }
+        inline _Mytype &operator--()
+        {
+            --m_index;
+            return *this;
+        }
 
-	bool operator<(_Mytype const& other) const
-	{
-		return m_index < other.m_index;
-	}
-	bool operator==(_Mytype const& other) const
-	{
-		return m_index == other.m_index;
-	}
+        inline _Mytype operator+(_Mytype const &rhs) const
+        {
+            return _Mytype(m_index + rhs.m_index, m_mesh);
+        }
+        inline difference_type operator-(_Mytype const &rhs) const
+        {
+            return m_index - rhs.m_index;
+        }
+        inline _Mytype operator-(int const &rhs) const
+        {
+            return _Mytype(m_index - rhs, m_mesh);
+        }
 
-	bool operator!=(_Mytype const& other) const
-	{
-		return !(*this == other);
-	}
+        unsigned int vertex(unsigned int i) const;
+        unsigned int &vertex(unsigned int i);
 
-	inline _Mytype& operator++() { ++m_index; return *this; }
-	inline _Mytype& operator--() { --m_index; return *this; }
+    private:
+        friend class FaceConstContainer;
+        FaceConstIterator(unsigned int index, TriangleMesh const *mesh)
+            : m_index(index), m_mesh(mesh) {}
 
-	inline _Mytype operator+(_Mytype const& rhs) const
-	{
-		return _Mytype(m_index + rhs.m_index, m_mesh);
-	}
-	inline difference_type operator-(_Mytype const& rhs) const
-	{
-		return m_index - rhs.m_index;
-	}
-	inline _Mytype operator-(int const& rhs) const
-	{
-		return _Mytype(m_index - rhs, m_mesh);
-	}
+        unsigned int m_index;
+        TriangleMesh const *m_mesh;
+    };
 
-	unsigned int vertex(unsigned int i) const;
-	unsigned int& vertex(unsigned int i);
+    class IncidentFaceContainer;
+    class IncidentFaceIterator : public std::iterator<std::forward_iterator_tag, Halfedge>
+    {
 
-private:
+    public:
+        typedef IncidentFaceIterator _Mytype;
 
-	friend class FaceConstContainer;
-	FaceConstIterator(unsigned int index, TriangleMesh const* mesh)
-		: m_index(index), m_mesh(mesh) {}
+        value_type operator*() { return m_h; }
+        _Mytype &operator++();
+        bool operator==(_Mytype const &other) const
+        {
+            return m_h == other.m_h;
+        }
 
-	unsigned int m_index;
-	TriangleMesh const* m_mesh;
-};
+        bool operator!=(_Mytype const &other) const
+        {
+            return !(*this == other);
+        }
 
-class IncidentFaceContainer;
-class IncidentFaceIterator : public std::iterator<std::forward_iterator_tag, Halfedge>
-{
+    private:
+        friend class IncidentFaceContainer;
+        IncidentFaceIterator(unsigned int v, TriangleMesh const *mesh);
+        IncidentFaceIterator() : m_h(), m_begin(), m_mesh(nullptr) {}
 
-public:
+        Halfedge m_h, m_begin;
+        TriangleMesh const *m_mesh;
+    };
 
-	typedef IncidentFaceIterator _Mytype;
+    class VertexContainer;
+    class VertexIterator : public std::iterator<std::random_access_iterator_tag, Eigen::Vector3f>
+    {
 
-	value_type operator*() { return m_h; }
-	_Mytype& operator++();
-	bool operator==(_Mytype const& other) const
-	{
-		return m_h == other.m_h;
-	}
+    public:
+        typedef VertexIterator _Mytype;
 
-	bool operator!=(_Mytype const& other) const
-	{
-		return !(*this == other);
-	}
+        VertexIterator() = delete;
 
-private:
+        reference operator*();
 
-	friend class IncidentFaceContainer;
-	IncidentFaceIterator(unsigned int v, TriangleMesh const* mesh);
-	IncidentFaceIterator() : m_h(), m_begin(), m_mesh(nullptr) {}
+        bool operator<(_Mytype const &other) const
+        {
+            return m_index < other.m_index;
+        }
+        bool operator==(_Mytype const &other) const
+        {
+            return m_index == other.m_index;
+        }
 
-	Halfedge m_h, m_begin;
-	TriangleMesh const* m_mesh;
-};
+        bool operator!=(_Mytype const &other) const
+        {
+            return !(*this == other);
+        }
 
+        inline _Mytype &operator++()
+        {
+            ++m_index;
+            return *this;
+        }
+        inline _Mytype &operator--()
+        {
+            --m_index;
+            return *this;
+        }
 
-class VertexContainer;
-class VertexIterator : public std::iterator<std::random_access_iterator_tag, Eigen::Vector3f>
-{
+        inline _Mytype operator+(_Mytype const &rhs) const
+        {
+            return _Mytype(m_index + rhs.m_index, m_mesh);
+        }
+        inline difference_type operator-(_Mytype const &rhs) const
+        {
+            return m_index - rhs.m_index;
+        }
+        inline _Mytype operator-(int const &rhs) const
+        {
+            return _Mytype(m_index - rhs, m_mesh);
+        }
 
-public:
+        unsigned int index() const;
 
-	typedef VertexIterator _Mytype;
+    private:
+        friend class VertexContainer;
+        VertexIterator(unsigned int index, TriangleMesh *mesh)
+            : m_index(index), m_mesh(mesh) {}
 
-	VertexIterator() = delete;
+        unsigned int m_index;
+        TriangleMesh *m_mesh;
+    };
 
-	reference operator*();
+    class VertexConstContainer;
+    class VertexConstIterator : public std::iterator<std::random_access_iterator_tag, Eigen::Vector3f const>
+    {
 
-	bool operator<(_Mytype const& other) const
-	{
-		return m_index < other.m_index;
-	}
-	bool operator==(_Mytype const& other) const
-	{
-		return m_index == other.m_index;
-	}
+    public:
+        typedef VertexConstIterator _Mytype;
 
-	bool operator!=(_Mytype const& other) const
-	{
-		return !(*this == other);
-	}
+        VertexConstIterator() = delete;
 
-	inline _Mytype& operator++() { ++m_index; return *this; }
-	inline _Mytype& operator--() { --m_index; return *this; }
+        reference operator*();
 
-	inline _Mytype operator+(_Mytype const& rhs) const
-	{ 
-		return _Mytype(m_index + rhs.m_index, m_mesh); 
-	}
-	inline difference_type operator-(_Mytype const& rhs) const
-	{ 
-		return m_index - rhs.m_index; 
-	}
-	inline _Mytype operator-(int const& rhs) const
-	{ 
-		return _Mytype(m_index - rhs, m_mesh); 
-	}
+        bool operator<(_Mytype const &other) const
+        {
+            return m_index < other.m_index;
+        }
+        bool operator==(_Mytype const &other) const
+        {
+            return m_index == other.m_index;
+        }
 
-	unsigned int index() const;
+        bool operator!=(_Mytype const &other) const
+        {
+            return !(*this == other);
+        }
 
-private:
+        inline _Mytype &operator++()
+        {
+            ++m_index;
+            return *this;
+        }
+        inline _Mytype &operator--()
+        {
+            --m_index;
+            return *this;
+        }
 
-	friend class VertexContainer;
-	VertexIterator(unsigned int index, TriangleMesh* mesh)
-		: m_index(index), m_mesh(mesh) {}
+        inline _Mytype operator+(_Mytype const &rhs) const
+        {
+            return _Mytype(m_index + rhs.m_index, m_mesh);
+        }
+        inline difference_type operator-(_Mytype const &rhs) const
+        {
+            return m_index - rhs.m_index;
+        }
+        inline _Mytype operator-(int const &rhs) const
+        {
+            return _Mytype(m_index - rhs, m_mesh);
+        }
 
-	unsigned int m_index;
-	TriangleMesh* m_mesh;
-};
+        unsigned int index() const;
 
+    private:
+        friend class VertexConstContainer;
+        VertexConstIterator(unsigned int index, TriangleMesh const *mesh)
+            : m_index(index), m_mesh(mesh) {}
 
-class VertexConstContainer;
-class VertexConstIterator : 
-	public std::iterator<std::random_access_iterator_tag, Eigen::Vector3f const>
-{
-
-public:
-
-	typedef VertexConstIterator _Mytype;
-
-	VertexConstIterator() = delete;
-
-	reference operator*();
-
-	bool operator<(_Mytype const& other) const
-	{
-		return m_index < other.m_index;
-	}
-	bool operator==(_Mytype const& other) const
-	{
-		return m_index == other.m_index;
-	}
-
-	bool operator!=(_Mytype const& other) const
-	{
-		return !(*this == other);
-	}
-
-	inline _Mytype& operator++() { ++m_index; return *this; }
-	inline _Mytype& operator--() { --m_index; return *this; }
-
-	inline _Mytype operator+(_Mytype const& rhs) const
-	{ 
-		return _Mytype(m_index + rhs.m_index, m_mesh); 
-	}
-	inline difference_type operator-(_Mytype const& rhs) const
-	{ 
-		return m_index - rhs.m_index; 
-	}
-	inline _Mytype operator-(int const& rhs) const
-	{ 
-		return _Mytype(m_index - rhs, m_mesh); 
-	}
-
-	unsigned int index() const;
-
-private:
-
-	friend class VertexConstContainer;
-	VertexConstIterator(unsigned int index, TriangleMesh const* mesh)
-		: m_index(index), m_mesh(mesh) {}
-
-	unsigned int m_index;
-	TriangleMesh const* m_mesh;
-};
+        unsigned int m_index;
+        TriangleMesh const *m_mesh;
+    };
 }
-
