@@ -32,7 +32,7 @@ set(CMAKE_DEBUG_POSTFIX "_d")
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
 set(LIBRARY_OUTPUT_PATH    "${PROJECT_BINARY_DIR}/bin")
 
-set(EIGEN3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/dependencies/eigen3")
+#set(EIGEN3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/dependencies/eigen3")
 add_subdirectory(discregrid)
 
 option(BUILD_CMD_EXECUTABLE "Build command line executable" ON)
