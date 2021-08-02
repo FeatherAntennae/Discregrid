@@ -152,7 +152,7 @@ private:
 
 
 class VertexContainer;
-class VertexIterator : public std::iterator<std::random_access_iterator_tag, Eigen::Vector3d>
+class VertexIterator : public std::iterator<std::random_access_iterator_tag, Eigen::Vector3f>
 {
 
 public:
@@ -208,7 +208,7 @@ private:
 
 class VertexConstContainer;
 class VertexConstIterator : 
-	public std::iterator<std::random_access_iterator_tag, Eigen::Vector3d const>
+	public std::iterator<std::random_access_iterator_tag, Eigen::Vector3f const>
 {
 
 public:
