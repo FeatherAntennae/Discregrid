@@ -38,7 +38,7 @@ namespace Discregrid
 
 	struct AverageTime
 	{
-		double totalTime;
+		float totalTime;
 		unsigned int counter;
 		std::string name;
 	};
@@ -71,7 +71,7 @@ namespace Discregrid
 			Timing::m_startCounter++;
 		}
 
-		static double stopTiming(bool print = true)
+		static float stopTiming(bool print = true)
 		{
 			if (!Timing::m_timingStack.empty())
 			{
@@ -79,8 +79,8 @@ namespace Discregrid
 				std::chrono::time_point<std::chrono::high_resolution_clock> stop = std::chrono::high_resolution_clock::now();
 				TimingHelper h = Timing::m_timingStack.top();
 				Timing::m_timingStack.pop();
-				std::chrono::duration<double> elapsed_seconds = stop - h.start;
-				double t = elapsed_seconds.count() * 1000.0;
+				std::chrono::duration<float> elapsed_seconds = stop - h.start;
+				float t = elapsed_seconds.count() * 1000.0;
 
 				if (print)
 					std::cout << "time " << h.name.c_str() << ": " << t << " ms\n" << std::flush;
@@ -89,7 +89,7 @@ namespace Discregrid
 			return 0;
 	}
 
-		static double stopTiming(bool print, int &id)
+		static float stopTiming(bool print, int &id)
 		{
 			if (id == -1)
 				id = m_id_counter++;
@@ -100,8 +100,8 @@ namespace Discregrid
 				TimingHelper h = Timing::m_timingStack.top();
 				Timing::m_timingStack.pop();
 
-				std::chrono::duration<double> elapsed_seconds = stop - h.start;
-				double t = elapsed_seconds.count() * 1000.0;
+				std::chrono::duration<float> elapsed_seconds = stop - h.start;
+				float t = elapsed_seconds.count() * 1000.0;
 
 				if (print && !Timing::m_dontPrintTimes)
 					std::cout << "time " << h.name.c_str() << ": " << t << " ms\n" << std::flush;
@@ -135,7 +135,7 @@ namespace Discregrid
 			for (iter = Timing::m_averageTimes.begin(); iter != Timing::m_averageTimes.end(); iter++)
 			{
 				AverageTime &at = iter->second;
-				const double avgTime = at.totalTime / at.counter;
+				const float avgTime = at.totalTime / at.counter;
 				std::cout << "Average time " << at.name.c_str() << ": " << avgTime << " ms\n" << std::flush;
 			}
 			if (Timing::m_startCounter != Timing::m_stopCounter)
@@ -149,7 +149,7 @@ namespace Discregrid
 			for (iter = Timing::m_averageTimes.begin(); iter != Timing::m_averageTimes.end(); iter++)
 			{
 				AverageTime &at = iter->second;
-				const double timeSum = at.totalTime;
+				const float timeSum = at.totalTime;
 				std::cout << "Time sum " << at.name.c_str() << ": " << timeSum << " ms\n" << std::flush;
 			}
 			if (Timing::m_startCounter != Timing::m_stopCounter)

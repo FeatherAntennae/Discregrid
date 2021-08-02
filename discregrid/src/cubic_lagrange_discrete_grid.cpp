@@ -20,7 +20,7 @@ namespace Discregrid
 namespace
 {
 
-double const abscissae[32][3] = {
+float const abscissae[32][3] = {
 	{-1.000000000000, -1.000000000000, -1.000000000000}, // 0
 	{-1.000000000000, -1.000000000000, 1.000000000000},  // 1
 	{-1.000000000000, 1.000000000000, -1.000000000000},  // 2
@@ -55,7 +55,7 @@ double const abscissae[32][3] = {
 	{1.000000000000, 1.000000000000, 0.333333333333}	 //31
 };
 
-double const abscissae_[32][3] = {
+float const abscissae_[32][3] = {
 	{-1.000000000000, -1.000000000000, -1.000000000000}, // 0 -->  0
 	{1.000000000000, -1.000000000000, -1.000000000000},  // 4 -->  1
 	{-1.000000000000, 1.000000000000, -1.000000000000},  // 2 -->  2
@@ -93,10 +93,10 @@ double const abscissae_[32][3] = {
 	{1.000000000000, 1.000000000000, 0.333333333333}	 //31 --> 31
 };
 
-Matrix<double, 32, 1>
-shape_function(Vector3d const &xi, Matrix<double, 32, 3> *gradient = nullptr)
+Matrix<float, 32, 1>
+shape_function(Vector3f const &xi, Matrix<float, 32, 3> *gradient = nullptr)
 {
-	auto res = Matrix<double, 32, 1>{};
+	auto res = Matrix<float, 32, 1>{};
 
 	auto x = xi[0];
 	auto y = xi[1];
@@ -336,10 +336,10 @@ shape_function(Vector3d const &xi, Matrix<double, 32, 3> *gradient = nullptr)
 	return res;
 }
 
-Matrix<double, 32, 1>
-shape_function_(Vector3d const &xi, Matrix<double, 32, 3> *gradient = nullptr)
+Matrix<float, 32, 1>
+shape_function_(Vector3f const &xi, Matrix<float, 32, 3> *gradient = nullptr)
 {
-	auto res = Matrix<double, 32, 1>{};
+	auto res = Matrix<float, 32, 1>{};
 
 	auto x = xi[0];
 	auto y = xi[1];
@@ -581,7 +581,7 @@ shape_function_(Vector3d const &xi, Matrix<double, 32, 3> *gradient = nullptr)
 
 // Determines Morten value according to z-curve.
 inline uint64_t
-zValue(Vector3d const &x, double invCellSize)
+zValue(Vector3f const &x, float invCellSize)
 {
 	std::array<int, 3> key;
 	for (unsigned int i(0); i < 3; ++i)
@@ -601,10 +601,10 @@ zValue(Vector3d const &x, double invCellSize)
 }
 } // namespace
 
-Vector3d
+Vector3f
 CubicLagrangeDiscreteGrid::indexToNodePosition(unsigned int l) const
 {
-	auto x = Vector3d{};
+	auto x = Vector3f{};
 
 	auto n = Matrix<unsigned int, 3, 1>::Map(m_resolution.data());
 
@@ -622,7 +622,7 @@ CubicLagrangeDiscreteGrid::indexToNodePosition(unsigned int l) const
 		ijk(1) = temp / (n[0] + 1);
 		ijk(0) = temp % (n[0] + 1);
 
-		x = m_domain.min() + m_cell_size.cwiseProduct(ijk.cast<double>());
+		x = m_domain.min() + m_cell_size.cwiseProduct(ijk.cast<float>());
 	}
 	else if (l < nv + 2 * ne_x)
 	{
@@ -633,8 +633,8 @@ CubicLagrangeDiscreteGrid::indexToNodePosition(unsigned int l) const
 		ijk(1) = temp / n[0];
 		ijk(0) = temp % n[0];
 
-		x = m_domain.min() + m_cell_size.cwiseProduct(ijk.cast<double>());
-		x(0) += (1.0 + static_cast<double>(l % 2)) / 3.0 * m_cell_size[0];
+		x = m_domain.min() + m_cell_size.cwiseProduct(ijk.cast<float>());
+		x(0) += (1.0 + static_cast<float>(l % 2)) / 3.0 * m_cell_size[0];
 	}
 	else if (l < nv + 2 * (ne_x + ne_y))
 	{
@@ -645,8 +645,8 @@ CubicLagrangeDiscreteGrid::indexToNodePosition(unsigned int l) const
 		ijk(2) = temp / n[1];
 		ijk(1) = temp % n[1];
 
-		x = m_domain.min() + m_cell_size.cwiseProduct(ijk.cast<double>());
-		x(1) += (1.0 + static_cast<double>(l % 2)) / 3.0 * m_cell_size[1];
+		x = m_domain.min() + m_cell_size.cwiseProduct(ijk.cast<float>());
+		x(1) += (1.0 + static_cast<float>(l % 2)) / 3.0 * m_cell_size[1];
 	}
 	else
 	{
@@ -657,8 +657,8 @@ CubicLagrangeDiscreteGrid::indexToNodePosition(unsigned int l) const
 		ijk(0) = temp / n[2];
 		ijk(2) = temp % n[2];
 
-		x = m_domain.min() + m_cell_size.cwiseProduct(ijk.cast<double>());
-		x(2) += (1.0 + static_cast<double>(l % 2)) / 3.0 * m_cell_size[2];
+		x = m_domain.min() + m_cell_size.cwiseProduct(ijk.cast<float>());
+		x(2) += (1.0 + static_cast<float>(l % 2)) / 3.0 * m_cell_size[2];
 	}
 
 	return x;
@@ -669,7 +669,7 @@ CubicLagrangeDiscreteGrid::CubicLagrangeDiscreteGrid(std::string const &filename
 	load(filename);
 }
 
-CubicLagrangeDiscreteGrid::CubicLagrangeDiscreteGrid(AlignedBox3d const &domain,
+CubicLagrangeDiscreteGrid::CubicLagrangeDiscreteGrid(AlignedBox3f const &domain,
 													 std::array<unsigned int, 3> const &resolution)
 	: DiscreteGrid(domain, resolution)
 {
@@ -814,7 +814,7 @@ CubicLagrangeDiscreteGrid::addFunction(ContinuousFunction const &func, bool verb
 			if (!pred || pred(x))
 				c = func(x);
 			else
-				c = std::numeric_limits<double>::max();
+				c = std::numeric_limits<float>::max();
 
 			if (verbose && (++counter == n_nodes || duration_cast<milliseconds>(high_resolution_clock::now() - t0).count() > 1000u))
 			{
@@ -823,7 +823,7 @@ CubicLagrangeDiscreteGrid::addFunction(ContinuousFunction const &func, bool verb
 					t0 = high_resolution_clock::now();
 					std::cout << "\r"
 							  << "Construction " << std::setw(20)
-							  << 100.0 * static_cast<double>(counter) / static_cast<double>(n_nodes) << "%";
+							  << 100.0 * static_cast<float>(counter) / static_cast<float>(n_nodes) << "%";
 					mutex.unlock();
 				});
 			}
@@ -892,16 +892,16 @@ CubicLagrangeDiscreteGrid::addFunction(ContinuousFunction const &func, bool verb
 
 	if (verbose)
 	{
-		std::cout << "\rConstruction took " << std::setw(15) << static_cast<double>(duration_cast<milliseconds>(high_resolution_clock::now() - t0_construction).count()) / 1000.0 << "s" << std::endl;
+		std::cout << "\rConstruction took " << std::setw(15) << static_cast<float>(duration_cast<milliseconds>(high_resolution_clock::now() - t0_construction).count()) / 1000.0 << "s" << std::endl;
 	}
 
 	return static_cast<unsigned int>(m_n_fields++);
 }
 
 bool
-CubicLagrangeDiscreteGrid::determineShapeFunctions(unsigned int field_id, Eigen::Vector3d const &x,
-	std::array<unsigned int, 32> &cell, Eigen::Vector3d &c0, Eigen::Matrix<double, 32, 1> &N,
-	Eigen::Matrix<double, 32, 3> *dN) const
+CubicLagrangeDiscreteGrid::determineShapeFunctions(unsigned int field_id, Eigen::Vector3f const &x,
+	std::array<unsigned int, 32> &cell, Eigen::Vector3f &c0, Eigen::Matrix<float, 32, 1> &N,
+	Eigen::Matrix<float, 32, 3> *dN) const
 {
 	if (!m_domain.contains(x))
 		return false;
@@ -923,7 +923,7 @@ CubicLagrangeDiscreteGrid::determineShapeFunctions(unsigned int field_id, Eigen:
 	auto d = sd.diagonal().eval();
 
 	auto denom = (sd.max() - sd.min()).eval();
-	c0 = Vector3d::Constant(2.0).cwiseQuotient(denom).eval();
+	c0 = Vector3f::Constant(2.0).cwiseQuotient(denom).eval();
 	auto c1 = (sd.max() + sd.min()).cwiseQuotient(denom).eval();
 	auto xi = (c0.cwiseProduct(x) - c1).eval();
 
@@ -932,9 +932,9 @@ CubicLagrangeDiscreteGrid::determineShapeFunctions(unsigned int field_id, Eigen:
 	return true;
 }
 
-double 
-CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Eigen::Vector3d const& xi, const std::array<unsigned int, 32> &cell, const Eigen::Vector3d &c0, const Eigen::Matrix<double, 32, 1> &N,
-	Eigen::Vector3d* gradient, Eigen::Matrix<double, 32, 3> *dN) const
+float 
+CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Eigen::Vector3f const& xi, const std::array<unsigned int, 32> &cell, const Eigen::Vector3f &c0, const Eigen::Matrix<float, 32, 1> &N,
+	Eigen::Vector3f* gradient, Eigen::Matrix<float, 32, 3> *dN) const
 {
 	if (!gradient)
 	{
@@ -943,9 +943,9 @@ CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Eigen::Vector3d co
 		{
 			auto v = cell[j];
 			auto c = m_nodes[field_id][v];
-			if (c == std::numeric_limits<double>::max())
+			if (c == std::numeric_limits<float>::max())
 			{
-				return std::numeric_limits<double>::max();
+				return std::numeric_limits<float>::max();
 			}
 			phi += c * N[j];
 		}
@@ -959,10 +959,10 @@ CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Eigen::Vector3d co
 	{
 		auto v = cell[j];
 		auto c = m_nodes[field_id][v];
-		if (c == std::numeric_limits<double>::max())
+		if (c == std::numeric_limits<float>::max())
 		{
 			gradient->setZero();
-			return std::numeric_limits<double>::max();
+			return std::numeric_limits<float>::max();
 		}
 		phi += c * N[j];
 		(*gradient)(0) += c * (*dN)(j, 0);
@@ -974,12 +974,12 @@ CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Eigen::Vector3d co
 	return phi;
 }
 
-double
-CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Vector3d const &x,
-									   Vector3d *gradient) const
+float
+CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Vector3f const &x,
+									   Vector3f *gradient) const
 {
 	if (!m_domain.contains(x))
-		return std::numeric_limits<double>::max();
+		return std::numeric_limits<float>::max();
 
 	auto mi = (x - m_domain.min()).cwiseProduct(m_inv_cell_size).cast<unsigned int>().eval();
 	if (mi[0] >= m_resolution[0])
@@ -991,14 +991,14 @@ CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Vector3d const &x,
 	auto i = multiToSingleIndex({{mi(0), mi(1), mi(2)}});
 	auto i_ = m_cell_map[field_id][i];
 	if (i_ == std::numeric_limits<unsigned int>::max())
-		return std::numeric_limits<double>::max();
+		return std::numeric_limits<float>::max();
 
 	auto sd = subdomain(i);
 	i = i_;
 	auto d = sd.diagonal().eval();
 
 	auto denom = (sd.max() - sd.min()).eval();
-	auto c0 = Vector3d::Constant(2.0).cwiseQuotient(denom).eval();
+	auto c0 = Vector3f::Constant(2.0).cwiseQuotient(denom).eval();
 	auto c1 = (sd.max() + sd.min()).cwiseQuotient(denom).eval();
 	auto xi = (c0.cwiseProduct(x) - c1).eval();
 
@@ -1012,9 +1012,9 @@ CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Vector3d const &x,
 		{
 			auto v = cell[j];
 			auto c = m_nodes[field_id][v];
-			if (c == std::numeric_limits<double>::max())
+			if (c == std::numeric_limits<float>::max())
 			{
-				return std::numeric_limits<double>::max();
+				return std::numeric_limits<float>::max();
 			}
 			phi += c * N[j];
 		}
@@ -1022,12 +1022,12 @@ CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Vector3d const &x,
 		return phi;
 	}
 
-	auto dN = Matrix<double, 32, 3>{};
+	auto dN = Matrix<float, 32, 3>{};
 	auto N = shape_function_(xi, &dN);
 
 	// TEST
 	//auto eps = 1.0e-6;
-	//auto ndN = Matrix<double, 32, 3>{};
+	//auto ndN = Matrix<float, 32, 3>{};
 	//for (auto j = 0u; j < 3u; ++j)
 	//{
 	//    auto xip = xi;
@@ -1047,10 +1047,10 @@ CubicLagrangeDiscreteGrid::interpolate(unsigned int field_id, Vector3d const &x,
 	{
 		auto v = cell[j];
 		auto c = m_nodes[field_id][v];
-		if (c == std::numeric_limits<double>::max())
+		if (c == std::numeric_limits<float>::max())
 		{
 			gradient->setZero();
-			return std::numeric_limits<double>::max();
+			return std::numeric_limits<float>::max();
 		}
 		phi += c * N[j];
 		(*gradient)(0) += c * dN(j, 0);
@@ -1070,7 +1070,7 @@ void CubicLagrangeDiscreteGrid::reduceField(unsigned int field_id, Predicate pre
 	for (auto l = 0u; l < coeffs.size(); ++l)
 	{
 		auto xi = indexToNodePosition(l);
-		keep[l] = pred(xi, coeffs[l]) && coeffs[l] != std::numeric_limits<double>::max();
+		keep[l] = pred(xi, coeffs[l]) && coeffs[l] != std::numeric_limits<float>::max();
 	}
 
 	auto &cell_map = m_cell_map[field_id];
@@ -1082,7 +1082,7 @@ void CubicLagrangeDiscreteGrid::reduceField(unsigned int field_id, Predicate pre
 	for (auto i = 0u; i < cells_.size(); ++i)
 	{
 		auto keep_cell = false;
-		auto vals = std::vector<double>{};
+		auto vals = std::vector<float>{};
 		for (auto v : cells_[i])
 		{
 			keep_cell |= keep[v];
@@ -1106,7 +1106,7 @@ void CubicLagrangeDiscreteGrid::reduceField(unsigned int field_id, Predicate pre
 	auto ne = ne_x + ne_y + ne_z;
 
 	// Reduce vertices.
-	auto xi = Vector3d{};
+	auto xi = Vector3f{};
 	auto z_values = std::vector<uint64_t>(coeffs.size());
 	for (auto l = 0u; l < coeffs.size(); ++l)
 	{
@@ -1174,14 +1174,14 @@ void CubicLagrangeDiscreteGrid::reduceField(unsigned int field_id, Predicate pre
 }
 
 void CubicLagrangeDiscreteGrid::forEachCell(unsigned int field_id,
-											std::function<void(unsigned int, AlignedBox3d const &, unsigned int)> const &cb) const
+											std::function<void(unsigned int, AlignedBox3f const &, unsigned int)> const &cb) const
 {
 	auto n = m_resolution[0] * m_resolution[1] * m_resolution[2];
 	for (auto i = 0u; i < n; ++i)
 	{
-		auto domain = AlignedBox3d{};
+		auto domain = AlignedBox3f{};
 		auto mi = singleToMultiIndex(i);
-		domain.min() = m_domain.min() + Matrix<unsigned int, 3, 1>::Map(mi.data()).cast<double>().cwiseProduct(m_cell_size);
+		domain.min() = m_domain.min() + Matrix<unsigned int, 3, 1>::Map(mi.data()).cast<float>().cwiseProduct(m_cell_size);
 		domain.max() = domain.min() + m_cell_size;
 
 		cb(i, domain, 0);
