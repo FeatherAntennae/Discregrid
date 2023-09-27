@@ -101,11 +101,22 @@ endif()
 # Set link libraries.
 target_link_libraries(Discregrid)
 
-install(TARGETS Discregrid
-		RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/bin
-		LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/lib
-		ARCHIVE DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/lib)
+if (DEFINED ${CMAKE_INSTALL_PREFIX})
+    install(TARGETS Discregrid
+    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/Discregrid/bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/Discregrid/lib
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/Discregrid/lib)
 
-install(DIRECTORY include
-DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid
-PATTERN "*.hpp")
+    install(DIRECTORY include
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/Discregrid
+    PATTERN "*.hpp")
+else()
+    install(TARGETS Discregrid
+    RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/bin
+    LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/lib
+    ARCHIVE DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/lib)
+
+    install(DIRECTORY include
+    DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid
+    PATTERN "*.hpp")
+endif()
