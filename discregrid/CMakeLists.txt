@@ -101,11 +101,11 @@ endif()
 # Set link libraries.
 target_link_libraries(Discregrid)
 
-# install(TARGETS Discregrid
-# 		RUNTIME DESTINATION bin
-# 		LIBRARY DESTINATION lib
-# 		ARCHIVE DESTINATION lib)
+install(TARGETS Discregrid
+		RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/bin
+		LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/lib
+		ARCHIVE DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid/lib)
 
-# install(DIRECTORY include
-# DESTINATION .
-# PATTERN "*.hpp")
+install(DIRECTORY include
+DESTINATION ${PROJECT_SOURCE_DIR}/out/Discregrid
+PATTERN "*.hpp")
