@@ -1,4 +1,3 @@
-
 set(HEADERS
 	include/Discregrid/discrete_grid.hpp
 	include/Discregrid/cubic_lagrange_discrete_grid.hpp
@@ -64,6 +63,7 @@ if(OPENMP_FOUND)
 endif()
 
 # Eigen library.
+set(EIGEN3_INCLUDE_DIR ../3rdParty/eigen3)
 find_package(Eigen3 REQUIRED)
 
 # Set include directories.
@@ -98,19 +98,14 @@ else()
 	add_library(Discregrid ${DISCREGRID_SOURCE_FILES})
 endif()
 
-# Discregrid has the following dependencies.
-#add_dependencies(Discregrid
-#)
-
 # Set link libraries.
-target_link_libraries(Discregrid
-)
+target_link_libraries(Discregrid)
 
-install(TARGETS Discregrid
-		RUNTIME DESTINATION bin
-		LIBRARY DESTINATION lib
-		ARCHIVE DESTINATION lib)
+# install(TARGETS Discregrid
+# 		RUNTIME DESTINATION bin
+# 		LIBRARY DESTINATION lib
+# 		ARCHIVE DESTINATION lib)
 
-install(DIRECTORY include
-DESTINATION .
-PATTERN "*.hpp")
+# install(DIRECTORY include
+# DESTINATION .
+# PATTERN "*.hpp")

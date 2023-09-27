@@ -3,6 +3,7 @@ set(RESOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources/")
 configure_file("../resource_path.hpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/resource_path.hpp")
 
 # Eigen library.
+set(EIGEN3_INCLUDE_DIR ../../3rdParty/eigen3)
 find_package(Eigen3 REQUIRED)
 
 # Set include directories.

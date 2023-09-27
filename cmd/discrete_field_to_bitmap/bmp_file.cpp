@@ -28,7 +28,8 @@ bool BmpReaderWriter::loadFile(const char *filename, unsigned int &width, unsign
 	num = fread(&header, sizeof(BMPHEADER), 1, f);
 	if(isBigEndian()) header.Type = endianSwap(header.Type);
 	if (num != 1) { fclose(f); return false; }
-	if (header.Type != 'MB') { fclose(f); return false; }
+	if (header.Type != 19778) { fclose(f); return false; }
+	// if (header.Type != 'MB') { fclose(f); return false; }
 
 	BMPINFO info;
 	num = fread(&info, sizeof(BMPINFO), 1, f);
@@ -76,7 +77,8 @@ bool BmpReaderWriter::saveFile(const char *filename, int width, int height, unsi
 
 	// todo : works on pcs only, swap correctly if big endian 
 	BMPHEADER header;
-	header.Type = 'MB';
+	// header.Type = 'MB';
+	header.Type = 19778;
 	header.Size = sizeof(BMPINFO);
 	header.Reserved1 = 0;
 	header.Reserved2 = 0;

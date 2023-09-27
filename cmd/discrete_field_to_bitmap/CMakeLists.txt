@@ -1,4 +1,5 @@
 # Eigen library.
+set(EIGEN3_INCLUDE_DIR ../../3rdParty/eigen3)
 find_package(Eigen3 REQUIRED)
 
 # Set include directories.

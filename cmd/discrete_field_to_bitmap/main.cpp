@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	("d,depth", "Relative depth value between -1 and 1 in direction of the axis orthogonal to the plane", cxxopts::value<double>()->default_value("0"))
 	("o,output", "Output (in bmp format)", cxxopts::value<std::string>()->default_value(""))
 	("c,colormap", "Color map options: redsequential (rs), green blue inverse diverging (gb) (suitable for visualiztion of signed distance fields)", cxxopts::value<std::string>()->default_value("gb"))
-	("input", "SDF file", cxxopts::value<std::vector<std::string>>())
+	("input", "SDF file (*.cdf or *.cdm)", cxxopts::value<std::vector<std::string>>())
 	;
 
 	try
@@ -73,9 +73,21 @@ int main(int argc, char* argv[])
 		std::cout << "Load SDF...";
 		if (extension == "cdf" || extension == "cdm")
 		{
-			sdf = std::unique_ptr<Discregrid::CubicLagrangeDiscreteGrid>(
-				new Discregrid::CubicLagrangeDiscreteGrid(filename));
-		}
+			sdf = std::unique_ptr<Discregrid::CubicLagrangeDiscreteGrid>(new Discregrid::CubicLagrangeDiscreteGrid(filename));
+		} else {
+            std::cout << "ERROR: Unsupported file extension. Must be *.cdf or *.cdm" << std::endl;
+			std::cout << options.help() << std::endl;
+			std::cout << std::endl << std::endl << "Example: SDFToBitmap -p xz file.sdf" << std::endl;
+			exit(1);
+        }
+
+        if (!sdf) {
+            std::cout << "ERROR: SDF creation failed" << std::endl;
+			std::cout << options.help() << std::endl;
+			std::cout << std::endl << std::endl << "Example: SDFToBitmap -p xz file.sdf" << std::endl;
+			exit(1);
+        }
+
 		std::cout << "DONE" << std::endl;
 
 		auto depth = result["d"].as<double>();

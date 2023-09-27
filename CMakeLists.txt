@@ -9,6 +9,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS on)
 # Require C++11 compiler
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/out")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIRECTORY}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIRECTORY}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIRECTORY}")
 
 
 # Enable simultaneous compilation of source files.
@@ -29,8 +35,8 @@ endif (BUILD_AS_SHARED_LIBS)
 set(CMAKE_DEBUG_POSTFIX "_d")
 
 # Put all executables and libraries into a common directory.
-set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
-set(LIBRARY_OUTPUT_PATH    "${PROJECT_BINARY_DIR}/bin")
+set(EXECUTABLE_OUTPUT_PATH "${OUTPUT_DIRECTORY}/bin")
+set(LIBRARY_OUTPUT_PATH    "${OUTPUT_DIRECTORY}/bin")
 
 add_subdirectory(discregrid)
 

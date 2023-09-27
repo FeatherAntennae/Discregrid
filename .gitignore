@@ -1,3 +1,8 @@
 *.bmp
 resource_path.hpp
 *.*sdf
+out
+.cache
+.vscode
+build*
+compile_commands*

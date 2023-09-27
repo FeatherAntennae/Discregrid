@@ -3,7 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <array>
-#include <Eigen/Dense>
+#include "Eigen/Dense"
 
 namespace Discregrid
 {
