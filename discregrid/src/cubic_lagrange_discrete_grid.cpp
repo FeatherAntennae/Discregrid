@@ -818,7 +818,7 @@ CubicLagrangeDiscreteGrid::addFunction(ContinuousFunction const &func, bool verb
 
 			if (verbose && (++counter == n_nodes || duration_cast<milliseconds>(high_resolution_clock::now() - t0).count() > 1000u))
 			{
-				std::async(std::launch::async, [&]() {
+				auto _discard = std::async(std::launch::async, [&]() {
 					mutex.lock();
 					t0 = high_resolution_clock::now();
 					std::cout << "\r"
