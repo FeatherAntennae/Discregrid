@@ -13,7 +13,6 @@ class TriangleMesh;
 class FaceContainer;
 class FaceIterator {
 public:
-
   // ITERATOR TRAITS -------------------------------
   /// One of the @link iterator_tags tag types@endlink.
   typedef std::random_access_iterator_tag iterator_category;
@@ -33,12 +32,7 @@ public:
 
   reference operator*();
 
-  bool operator<(_Mytype const &other) const { return m_index < other.m_index; }
-  bool operator==(_Mytype const &other) const {
-    return m_index == other.m_index;
-  }
-
-  bool operator!=(_Mytype const &other) const { return !(*this == other); }
+  auto operator<=>(const _Mytype &other) const { return m_index <=> other.m_index; }
 
   inline _Mytype &operator++() {
     ++m_index;
@@ -70,9 +64,9 @@ private:
   unsigned int m_index;
   TriangleMesh *m_mesh;
 };
+
 class FaceConstIterator {
 public:
-
   // ITERATOR TRAITS -------------------------------
   /// One of the @link iterator_tags tag types@endlink.
   typedef std::random_access_iterator_tag iterator_category;
@@ -92,12 +86,7 @@ public:
 
   reference operator*();
 
-  bool operator<(_Mytype const &other) const { return m_index < other.m_index; }
-  bool operator==(_Mytype const &other) const {
-    return m_index == other.m_index;
-  }
-
-  bool operator!=(_Mytype const &other) const { return !(*this == other); }
+  auto operator<=>(const _Mytype &other) const { return m_index <=> other.m_index; }
 
   inline _Mytype &operator++() {
     ++m_index;
@@ -134,7 +123,6 @@ class IncidentFaceContainer;
 class IncidentFaceIterator {
 
 public:
-
   // ITERATOR TRAITS -------------------------------
   /// One of the @link iterator_tags tag types@endlink.
   typedef std::forward_iterator_tag iterator_category;
@@ -147,7 +135,6 @@ public:
   /// This type represents a reference-to-value_type.
   typedef Halfedge &reference;
   // -----------------------------------------------
-
 
   typedef IncidentFaceIterator _Mytype;
 
@@ -170,7 +157,6 @@ class VertexContainer;
 class VertexIterator {
 
 public:
-
   // ITERATOR TRAITS -------------------------------
   /// One of the @link iterator_tags tag types@endlink.
   typedef std::random_access_iterator_tag iterator_category;
@@ -184,19 +170,13 @@ public:
   typedef Eigen::Vector3d &reference;
   // -----------------------------------------------
 
-
   typedef VertexIterator _Mytype;
 
   VertexIterator() = delete;
 
   reference operator*();
 
-  bool operator<(_Mytype const &other) const { return m_index < other.m_index; }
-  bool operator==(_Mytype const &other) const {
-    return m_index == other.m_index;
-  }
-
-  bool operator!=(_Mytype const &other) const { return !(*this == other); }
+  auto operator<=>(const _Mytype &other) const { return m_index <=> other.m_index; }
 
   inline _Mytype &operator++() {
     ++m_index;
@@ -251,12 +231,7 @@ public:
 
   reference operator*();
 
-  bool operator<(_Mytype const &other) const { return m_index < other.m_index; }
-  bool operator==(_Mytype const &other) const {
-    return m_index == other.m_index;
-  }
-
-  bool operator!=(_Mytype const &other) const { return !(*this == other); }
+  auto operator<=>(const _Mytype &other) const { return m_index <=> other.m_index; }
 
   inline _Mytype &operator++() {
     ++m_index;
