@@ -8,258 +8,210 @@
 
 namespace Discregrid {
 
-class TriangleMesh;
+    class TriangleMesh;
 
-class FaceContainer;
-class FaceIterator {
-public:
-  // ITERATOR TRAITS -------------------------------
-  /// One of the @link iterator_tags tag types@endlink.
-  typedef std::random_access_iterator_tag iterator_category;
-  /// The type "pointed to" by the iterator.
-  typedef std::array<unsigned int, 3> value_type;
-  /// Distance between iterators is represented as this type.
-  typedef ptrdiff_t difference_type;
-  /// This type represents a pointer-to-value_type.
-  typedef std::array<unsigned int, 3> *pointer;
-  /// This type represents a reference-to-value_type.
-  typedef std::array<unsigned int, 3> &reference;
-  // -----------------------------------------------
+    class FaceContainer;
+    class FaceIterator {
+    public:
+        // ITERATOR TRAITS -------------------------------
+        /// One of the @link iterator_tags tag types@endlink.
+        using iterator_category = std::random_access_iterator_tag;
+        /// The type "pointed to" by the iterator.
+        using value_type = std::array<unsigned int, 3>;
+        /// Distance between iterators is represented as this type.
+        using difference_type = ptrdiff_t;
+        /// This type represents a pointer-to-value_type.
+        using pointer = std::array<unsigned int, 3>*;
+        /// This type represents a reference-to-value_type.
+        using reference = std::array<unsigned int, 3>&;
+        // -----------------------------------------------
 
-  typedef FaceIterator _Mytype;
+        using T = FaceIterator;
 
-  FaceIterator() = delete;
+        FaceIterator() = delete;
 
-  reference operator*();
+        reference operator*();
 
-  auto operator<=>(const _Mytype &other) const { return m_index <=> other.m_index; }
+        bool operator==(T const& other) const { return m_index == other.m_index; }
+        bool operator!=(T const& other) const { return !(*this == other); }
+        auto operator<=>(const T& other) const { return m_index <=> other.m_index; }
 
-  inline _Mytype &operator++() {
-    ++m_index;
-    return *this;
-  }
-  inline _Mytype &operator--() {
-    --m_index;
-    return *this;
-  }
+        inline T& operator++() { ++m_index; return *this; }
+        inline T& operator--()  { --m_index; return *this; }
 
-  inline _Mytype operator+(_Mytype const &rhs) {
-    return _Mytype(m_index + rhs.m_index, m_mesh);
-  }
-  inline difference_type operator-(_Mytype const &rhs) {
-    return m_index - rhs.m_index;
-  }
-  inline _Mytype operator-(int const &rhs) {
-    return _Mytype(m_index - rhs, m_mesh);
-  }
+        inline T operator+(T const& rhs) const { return T(m_index + rhs.m_index, m_mesh); }
+        inline difference_type operator-(T const& rhs) const { return m_index - rhs.m_index;  }
+        inline T operator-(int const& rhs) const { return T(m_index - rhs, m_mesh);  }
 
-  unsigned int vertex(unsigned int i) const;
-  unsigned int &vertex(unsigned int i);
+        unsigned int vertex(unsigned int i) const;
+        unsigned int& vertex(unsigned int i);
 
-private:
-  friend class FaceContainer;
-  FaceIterator(unsigned int index, TriangleMesh *mesh)
-      : m_index(index), m_mesh(mesh) {}
+    private:
+        friend class FaceContainer;
+        FaceIterator(unsigned int index, TriangleMesh* mesh):  m_index(index), m_mesh(mesh) {}
 
-  unsigned int m_index;
-  TriangleMesh *m_mesh;
-};
+        unsigned int m_index;
+        TriangleMesh* m_mesh;
+    };
 
-class FaceConstIterator {
-public:
-  // ITERATOR TRAITS -------------------------------
-  /// One of the @link iterator_tags tag types@endlink.
-  typedef std::random_access_iterator_tag iterator_category;
-  /// The type "pointed to" by the iterator.
-  typedef std::array<unsigned int, 3> const value_type;
-  /// Distance between iterators is represented as this type.
-  typedef ptrdiff_t difference_type;
-  /// This type represents a pointer-to-value_type.
-  typedef std::array<unsigned int, 3> const *pointer;
-  /// This type represents a reference-to-value_type.
-  typedef std::array<unsigned int, 3> const &reference;
-  // -----------------------------------------------
+    class FaceConstIterator {
+    public:
+        // ITERATOR TRAITS -------------------------------
+        /// One of the @link iterator_tags tag types@endlink.
+        using iterator_category = std::random_access_iterator_tag;
+        /// The type "pointed to" by the iterator.
+        using value_type = std::array<unsigned int, 3> const;
+        /// Distance between iterators is represented as this type.
+        using difference_type = ptrdiff_t;
+        /// This type represents a pointer-to-value_type.
+        using pointer = std::array<unsigned int, 3> const*;
+        /// This type represents a reference-to-value_type.
+        using reference = std::array<unsigned int, 3> const&;
+        // -----------------------------------------------
 
-  typedef FaceConstIterator _Mytype;
+        using T = FaceConstIterator;
 
-  FaceConstIterator() = delete;
+        FaceConstIterator() = delete;
 
-  reference operator*();
+        reference operator*();
 
-  auto operator<=>(const _Mytype &other) const { return m_index <=> other.m_index; }
+        bool operator==(T const& other) const { return m_index == other.m_index; }
+        bool operator!=(T const& other) const { return !(*this == other); }
+        auto operator<=>(const T& other) const { return m_index <=> other.m_index; }
 
-  inline _Mytype &operator++() {
-    ++m_index;
-    return *this;
-  }
-  inline _Mytype &operator--() {
-    --m_index;
-    return *this;
-  }
+        inline T& operator++()  { ++m_index;  return *this; }
+        inline T& operator--() { --m_index; return *this; }
 
-  inline _Mytype operator+(_Mytype const &rhs) const {
-    return _Mytype(m_index + rhs.m_index, m_mesh);
-  }
-  inline difference_type operator-(_Mytype const &rhs) const {
-    return m_index - rhs.m_index;
-  }
-  inline _Mytype operator-(int const &rhs) const {
-    return _Mytype(m_index - rhs, m_mesh);
-  }
+        inline T operator+(T const& rhs) const { return T(m_index + rhs.m_index, m_mesh);  }
+        inline difference_type operator-(T const& rhs) const  { return m_index - rhs.m_index; }
+        inline T operator-(int const& rhs) const  { return T(m_index - rhs, m_mesh);   }
 
-  unsigned int vertex(unsigned int i) const;
-  unsigned int &vertex(unsigned int i);
+        unsigned int vertex(unsigned int i) const;
+        unsigned int& vertex(unsigned int i);
 
-private:
-  friend class FaceConstContainer;
-  FaceConstIterator(unsigned int index, TriangleMesh const *mesh)
-      : m_index(index), m_mesh(mesh) {}
+    private:
+        friend class FaceConstContainer;
+        FaceConstIterator(unsigned int index, TriangleMesh const* mesh): m_index(index), m_mesh(mesh) {}
 
-  unsigned int m_index;
-  TriangleMesh const *m_mesh;
-};
+        unsigned int m_index;
+        TriangleMesh const* m_mesh;
+    };
 
-class IncidentFaceContainer;
-class IncidentFaceIterator {
+    class IncidentFaceContainer;
+    class IncidentFaceIterator {
+    public:
+        // ITERATOR TRAITS -------------------------------
+        /// One of the @link iterator_tags tag types@endlink.
+        using iterator_category = std::forward_iterator_tag;
+        /// The type "pointed to" by the iterator.
+        using value_type = Halfedge;
+        /// Distance between iterators is represented as this type.
+        using difference_type = ptrdiff_t;
+        /// This type represents a pointer-to-value_type.
+        using pointer = Halfedge*;
+        /// This type represents a reference-to-value_type.
+        using reference = Halfedge&;
+        // -----------------------------------------------
 
-public:
-  // ITERATOR TRAITS -------------------------------
-  /// One of the @link iterator_tags tag types@endlink.
-  typedef std::forward_iterator_tag iterator_category;
-  /// The type "pointed to" by the iterator.
-  typedef Halfedge value_type;
-  /// Distance between iterators is represented as this type.
-  typedef ptrdiff_t difference_type;
-  /// This type represents a pointer-to-value_type.
-  typedef Halfedge *pointer;
-  /// This type represents a reference-to-value_type.
-  typedef Halfedge &reference;
-  // -----------------------------------------------
+        using T = IncidentFaceIterator;
 
-  typedef IncidentFaceIterator _Mytype;
+        value_type operator*() { return m_h; }
+        T& operator++();
+        bool operator==(T const& other) const { return m_h == other.m_h; }
+        bool operator!=(T const& other) const { return !(*this == other); }
 
-  value_type operator*() { return m_h; }
-  _Mytype &operator++();
-  bool operator==(_Mytype const &other) const { return m_h == other.m_h; }
+    private:
+        friend class IncidentFaceContainer;
+        IncidentFaceIterator(unsigned int v, TriangleMesh const* mesh);
+        IncidentFaceIterator(): m_h(), m_begin(),  m_mesh(nullptr) {}
 
-  bool operator!=(_Mytype const &other) const { return !(*this == other); }
+        Halfedge m_h, m_begin;
+        TriangleMesh const* m_mesh;
+    };
 
-private:
-  friend class IncidentFaceContainer;
-  IncidentFaceIterator(unsigned int v, TriangleMesh const *mesh);
-  IncidentFaceIterator() : m_h(), m_begin(), m_mesh(nullptr) {}
+    class VertexContainer;
+    class VertexIterator {
+    public:
+        // ITERATOR TRAITS -------------------------------
+        /// One of the @link iterator_tags tag types@endlink.
+        using iterator_category = std::random_access_iterator_tag;
+        /// The type "pointed to" by the iterator.
+        using value_type = Eigen::Vector3d;
+        /// Distance between iterators is represented as this type.
+        using difference_type = ptrdiff_t;
+        /// This type represents a pointer-to-value_type.
+        using pointer = Eigen::Vector3d*;
+        /// This type represents a reference-to-value_type.
+        using reference = Eigen::Vector3d&;
+        // -----------------------------------------------
 
-  Halfedge m_h, m_begin;
-  TriangleMesh const *m_mesh;
-};
+        using T = VertexIterator;
 
-class VertexContainer;
-class VertexIterator {
+        VertexIterator() = delete;
 
-public:
-  // ITERATOR TRAITS -------------------------------
-  /// One of the @link iterator_tags tag types@endlink.
-  typedef std::random_access_iterator_tag iterator_category;
-  /// The type "pointed to" by the iterator.
-  typedef Eigen::Vector3d value_type;
-  /// Distance between iterators is represented as this type.
-  typedef ptrdiff_t difference_type;
-  /// This type represents a pointer-to-value_type.
-  typedef Eigen::Vector3d *pointer;
-  /// This type represents a reference-to-value_type.
-  typedef Eigen::Vector3d &reference;
-  // -----------------------------------------------
+        reference operator*();
 
-  typedef VertexIterator _Mytype;
+        bool operator==(T const& other) const { return m_index == other.m_index; }
+        bool operator!=(T const& other) const { return !(*this == other); }
+        auto operator<=>(const T& other) const { return m_index <=> other.m_index; }
 
-  VertexIterator() = delete;
+        inline T& operator++() { ++m_index; return *this; }
+        inline T& operator--() { --m_index; return *this;  }
 
-  reference operator*();
+        inline T operator+(T const& rhs) const { return T(m_index + rhs.m_index, m_mesh); }
+        inline difference_type operator-(T const& rhs) const { return m_index - rhs.m_index; }
+        inline T operator-(int const& rhs) const { return T(m_index - rhs, m_mesh); }
 
-  auto operator<=>(const _Mytype &other) const { return m_index <=> other.m_index; }
+        unsigned int index() const;
 
-  inline _Mytype &operator++() {
-    ++m_index;
-    return *this;
-  }
-  inline _Mytype &operator--() {
-    --m_index;
-    return *this;
-  }
+    private:
+        friend class VertexContainer;
+        VertexIterator(unsigned int index, TriangleMesh* mesh): m_index(index), m_mesh(mesh) {}
 
-  inline _Mytype operator+(_Mytype const &rhs) const {
-    return _Mytype(m_index + rhs.m_index, m_mesh);
-  }
-  inline difference_type operator-(_Mytype const &rhs) const {
-    return m_index - rhs.m_index;
-  }
-  inline _Mytype operator-(int const &rhs) const {
-    return _Mytype(m_index - rhs, m_mesh);
-  }
+        unsigned int m_index;
+        TriangleMesh* m_mesh;
+    };
 
-  unsigned int index() const;
+    class VertexConstContainer;
+    class VertexConstIterator {
+    public:
+        // ITERATOR TRAITS -------------------------------
+        /// One of the @link iterator_tags tag types@endlink.
+        using iterator_category = std::random_access_iterator_tag;
+        /// The type "pointed to" by the iterator.
+        using value_type = Eigen::Vector3d const;
+        /// Distance between iterators is represented as this type.
+        using difference_type = ptrdiff_t;
+        /// This type represents a pointer-to-value_type.
+        using pointer = Eigen::Vector3d const*;
+        /// This type represents a reference-to-value_type.
+        using reference = Eigen::Vector3d const&;
+        // -----------------------------------------------
 
-private:
-  friend class VertexContainer;
-  VertexIterator(unsigned int index, TriangleMesh *mesh)
-      : m_index(index), m_mesh(mesh) {}
+        using T = VertexConstIterator;
 
-  unsigned int m_index;
-  TriangleMesh *m_mesh;
-};
+        VertexConstIterator() = delete;
 
-class VertexConstContainer;
-class VertexConstIterator {
+        reference operator*();
 
-public:
-  // ITERATOR TRAITS -------------------------------
-  /// One of the @link iterator_tags tag types@endlink.
-  typedef std::random_access_iterator_tag iterator_category;
-  /// The type "pointed to" by the iterator.
-  typedef Eigen::Vector3d const value_type;
-  /// Distance between iterators is represented as this type.
-  typedef ptrdiff_t difference_type;
-  /// This type represents a pointer-to-value_type.
-  typedef Eigen::Vector3d const *pointer;
-  /// This type represents a reference-to-value_type.
-  typedef Eigen::Vector3d const &reference;
-  // -----------------------------------------------
+        bool operator==(T const& other) const { return m_index == other.m_index; }
+        bool operator!=(T const& other) const { return !(*this == other); }
+        auto operator<=>(const T& other) const { return m_index <=> other.m_index; }
 
-  typedef VertexConstIterator _Mytype;
+        inline T& operator++() { ++m_index; return *this; }
+        inline T& operator--() { --m_index; return *this; }
 
-  VertexConstIterator() = delete;
+        inline T operator+(T const& rhs) const { return T(m_index + rhs.m_index, m_mesh); }
+        inline difference_type operator-(T const& rhs) const { return m_index - rhs.m_index; }
+        inline T operator-(int const& rhs) const { return T(m_index - rhs, m_mesh); }
 
-  reference operator*();
+        unsigned int index() const;
 
-  auto operator<=>(const _Mytype &other) const { return m_index <=> other.m_index; }
+    private:
+        friend class VertexConstContainer;
+        VertexConstIterator(unsigned int index, TriangleMesh const* mesh): m_index(index), m_mesh(mesh) {}
 
-  inline _Mytype &operator++() {
-    ++m_index;
-    return *this;
-  }
-  inline _Mytype &operator--() {
-    --m_index;
-    return *this;
-  }
-
-  inline _Mytype operator+(_Mytype const &rhs) const {
-    return _Mytype(m_index + rhs.m_index, m_mesh);
-  }
-  inline difference_type operator-(_Mytype const &rhs) const {
-    return m_index - rhs.m_index;
-  }
-  inline _Mytype operator-(int const &rhs) const {
-    return _Mytype(m_index - rhs, m_mesh);
-  }
-
-  unsigned int index() const;
-
-private:
-  friend class VertexConstContainer;
-  VertexConstIterator(unsigned int index, TriangleMesh const *mesh)
-      : m_index(index), m_mesh(mesh) {}
-
-  unsigned int m_index;
-  TriangleMesh const *m_mesh;
-};
+        unsigned int m_index;
+        TriangleMesh const* m_mesh;
+    };
 } // namespace Discregrid

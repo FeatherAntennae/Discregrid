@@ -2,110 +2,64 @@
 
 #include "entity_iterators.hpp"
 
-namespace Discregrid
-{
+namespace Discregrid {
 
-class TriangleMesh;
+    class TriangleMesh;
 
-class FaceContainer
-{
+    class FaceContainer {
+    public:
+        FaceIterator begin() const { return FaceIterator(0, m_mesh); }
+        FaceIterator end() const;
 
-public:
+    private:
+        friend class TriangleMesh;
+        FaceContainer(TriangleMesh* mesh): m_mesh(mesh) {}
+        TriangleMesh* m_mesh;
+    };
 
-	FaceIterator begin() const
-	{
-		return FaceIterator(0, m_mesh);
-	}
-	FaceIterator end() const;
+    class FaceConstContainer {
+    public:
+        FaceConstIterator begin() const { return FaceConstIterator(0, m_mesh); }
+        FaceConstIterator end() const;
 
-private:
-
-	friend class TriangleMesh;
-	FaceContainer(TriangleMesh* mesh) : m_mesh(mesh) {}
-
-	TriangleMesh* m_mesh;
-};
-
-class FaceConstContainer
-{
-
-public:
-
-	FaceConstIterator begin() const
-	{
-		return FaceConstIterator(0, m_mesh);
-	}
-	FaceConstIterator end() const;
-
-private:
-
-	friend class TriangleMesh;
-	FaceConstContainer(TriangleMesh const* mesh) : m_mesh(mesh) {}
-
-	TriangleMesh const* m_mesh;
-};
+    private:
+        friend class TriangleMesh;
+        FaceConstContainer(TriangleMesh const* mesh): m_mesh(mesh) {}
+        TriangleMesh const* m_mesh;
+    };
 
 
-class IncidentFaceContainer
-{
+    class IncidentFaceContainer {
+    public:
+        IncidentFaceIterator begin() const { return IncidentFaceIterator(m_v, m_mesh); }
+        IncidentFaceIterator end() const  { return IncidentFaceIterator();  }
 
-public:
+    private:
+        friend class TriangleMesh;
+        IncidentFaceContainer(unsigned int v, TriangleMesh const* mesh): m_v(v), m_mesh(mesh) {}
+        TriangleMesh const* m_mesh;
+        unsigned int m_v;
+    };
 
-	IncidentFaceIterator begin() const
-	{
-		return IncidentFaceIterator(m_v, m_mesh);
-	}
-	IncidentFaceIterator end() const
-	{
-		return IncidentFaceIterator();
-	}
+    class VertexContainer {
+    public:
+        VertexIterator begin() const { return VertexIterator(0, m_mesh);  }
+        VertexIterator end() const;
 
-private:
+    private:
+        friend class TriangleMesh;
+        VertexContainer(TriangleMesh* mesh) : m_mesh(mesh) {}
+        TriangleMesh* m_mesh;
+    };
 
-	friend class TriangleMesh;
-	IncidentFaceContainer(unsigned int v, TriangleMesh const* mesh) 
-		: m_v(v), m_mesh(mesh) {}
+    class VertexConstContainer {
+    public:
+        VertexConstIterator begin() const { return VertexConstIterator(0, m_mesh);  }
+        VertexConstIterator end() const;
 
-	TriangleMesh const* m_mesh;
-	unsigned int m_v;
-};
-
-class VertexContainer
-{
-
-public:
-
-	VertexIterator begin() const
-	{
-		return VertexIterator(0, m_mesh);
-	}
-	VertexIterator end() const;
-
-private:
-
-	friend class TriangleMesh;
-	VertexContainer(TriangleMesh* mesh) : m_mesh(mesh) {}
-
-	TriangleMesh* m_mesh;
-};
-
-class VertexConstContainer
-{
-
-public:
-
-	VertexConstIterator begin() const
-	{
-		return VertexConstIterator(0, m_mesh);
-	}
-	VertexConstIterator end() const;
-
-private:
-
-	friend class TriangleMesh;
-	VertexConstContainer(TriangleMesh const* mesh) : m_mesh(mesh) {}
-
-	TriangleMesh const* m_mesh;
-};
-}
-
+    private:
+        friend class TriangleMesh;
+        VertexConstContainer(TriangleMesh const* mesh): m_mesh(mesh) {}
+        TriangleMesh const* m_mesh;
+    };
+} // namespace Discregrid
